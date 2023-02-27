@@ -14,11 +14,11 @@ import java.util.List;
 public class UserDaoHibernateImpl implements UserDao {
     private Util util = new Util();
     private String sql;
-    private Transaction transaction = null;
 
 
     @Override
     public void createUsersTable() {
+        Transaction transaction = null;
         sql = "CREATE TABLE IF NOT EXISTS users (id int auto_increment primary key,name varchar(10),lastName varchar(10),age int(2))";
         try (Session session = util.getSessionConnection().openSession()) {
             transaction = session.beginTransaction();
@@ -36,6 +36,7 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void dropUsersTable() {
+        Transaction transaction = null;
         sql = "DROP TABLE IF EXISTS users";
         try (Session session = util.getSessionConnection().openSession()) {
             transaction = session.beginTransaction();
@@ -69,9 +70,6 @@ public class UserDaoHibernateImpl implements UserDao {
             session.createQuery("delete User where id = :id")
                     .setParameter("id", id).executeUpdate();
         } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
             e.printStackTrace();
         }
         System.out.println("Удален user с id = " + id);
@@ -97,9 +95,6 @@ public class UserDaoHibernateImpl implements UserDao {
             session.createQuery("delete User").executeUpdate();
             session.getTransaction().commit();
         } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
             e.printStackTrace();
         }
         System.out.println("Таблица очищена");
