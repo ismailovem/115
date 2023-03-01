@@ -6,29 +6,27 @@ import jm.task.core.jdbc.util.Util;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 
+
+
+
+import javax.persistence.TypedQuery;
 import java.util.ArrayList;
 import java.util.List;
 
 public class UserDaoHibernateImpl implements UserDao {
-    private Util util = new Util();
+    private final Util util = new Util();
     private String sql;
 
 
     @Override
     public void createUsersTable() {
-        Transaction transaction = null;
         sql = "CREATE TABLE IF NOT EXISTS users (id int auto_increment primary key,name varchar(10),lastName varchar(10),age int(2))";
         try (Session session = util.getSessionConnection().openSession()) {
-            transaction = session.beginTransaction();
+            session.beginTransaction();
             session.createSQLQuery(sql).addEntity(User.class).executeUpdate();
-            transaction.commit();
-            session.close();
+            session.getTransaction().commit();
         } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
             e.printStackTrace();
         }
         System.out.println("Таблица создана");
@@ -36,16 +34,12 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void dropUsersTable() {
-        Transaction transaction = null;
         sql = "DROP TABLE IF EXISTS users";
         try (Session session = util.getSessionConnection().openSession()) {
-            transaction = session.beginTransaction();
+            session.beginTransaction();
             session.createSQLQuery(sql).addEntity(User.class).executeUpdate();
-            transaction.commit();
+            session.getTransaction().commit();
         } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
             e.printStackTrace();
         }
         System.out.println("Таблица удалена");
@@ -54,10 +48,12 @@ public class UserDaoHibernateImpl implements UserDao {
     public void saveUser(String name, String lastName, byte age) {
         User user = new User();
         try (Session session = util.getSessionConnection().openSession()) {
+            session.beginTransaction();
             user.setName(name);
             user.setLastName(lastName);
             user.setAge(age);
             session.save(user);
+            session.getTransaction().commit();
         } catch (HibernateException e) {
             e.printStackTrace();
         }
@@ -69,6 +65,7 @@ public class UserDaoHibernateImpl implements UserDao {
             session.beginTransaction();
             session.createQuery("delete User where id = :id")
                     .setParameter("id", id).executeUpdate();
+            session.getTransaction().commit();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -78,12 +75,15 @@ public class UserDaoHibernateImpl implements UserDao {
     public List<User> getAllUsers() {
         List<User> list = new ArrayList<>();
         try (Session session = util.getSessionConnection().openSession()) {
-            list = session.createQuery("from User", User.class).list();
+            session.beginTransaction();
+            TypedQuery <User> query = session.createQuery("from User", User.class);
+            list = query.getResultList();
+            for (User user : list) {
+                System.out.println(user.toString());
+            }
+            session.getTransaction().commit();
         } catch (HibernateException e) {
             e.printStackTrace();
-        }
-        for (User user : list) {
-            System.out.println(user.toString());
         }
         return list;
     }

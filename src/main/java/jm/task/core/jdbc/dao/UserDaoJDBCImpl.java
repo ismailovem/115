@@ -10,14 +10,14 @@ import java.util.List;
 
 public class UserDaoJDBCImpl implements UserDao {
     private String sql;
-    private Util util = new Util();
+    private final Util util = new Util();
 
     public UserDaoJDBCImpl() {
     }
     public void createUsersTable() {
         sql = "CREATE TABLE IF NOT EXISTS users (id int auto_increment primary key,name varchar(10),lastName varchar(10),age int(2))";
         try (Statement statement = util.getConnection().createStatement()) {
-            int result = statement.executeUpdate(sql);
+            statement.executeUpdate(sql);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -26,7 +26,7 @@ public class UserDaoJDBCImpl implements UserDao {
     public void dropUsersTable() {
         sql = "DROP TABLE IF EXISTS users";
         try (Statement statement = util.getConnection().createStatement()) {
-            int result = statement.executeUpdate(sql);
+            statement.executeUpdate(sql);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -82,7 +82,7 @@ public class UserDaoJDBCImpl implements UserDao {
     public void cleanUsersTable() {
         sql = "TRUNCATE TABLE users";
         try (Statement statement = util.getConnection().createStatement()) {
-            int result = statement.executeUpdate(sql);
+            statement.executeUpdate(sql);
         } catch (SQLException e) {
             e.printStackTrace();
         }

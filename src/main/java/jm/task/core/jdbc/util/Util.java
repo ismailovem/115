@@ -13,10 +13,9 @@ import java.sql.SQLException;
 
 public class Util {
     // реализуйте настройку соеденения с БД
-    private String dbURL = "jdbc:mysql://localhost:3306/data";
-    private String driver   = "com.mysql.cj.jdbc.Driver";
-    private String userName = "roma";
-    private String password = "88888888";
+    private final String dbURL = "jdbc:mysql://localhost:3306/data";
+    private final String userName = "roma";
+    private final String password = "88888888";
 
     private static SessionFactory sessionFactory;
 
@@ -25,6 +24,7 @@ public class Util {
     }
 
     public SessionFactory getSessionConnection() {
+        String driver = "com.mysql.cj.jdbc.Driver";
         Configuration cfg = new Configuration()
                 .addAnnotatedClass(User.class)
                 .setProperty("hibernate.order_updates", "true")
