@@ -7,9 +7,6 @@ import jm.task.core.jdbc.util.Util;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 
-
-
-
 import javax.persistence.TypedQuery;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,8 +43,8 @@ public class UserDaoHibernateImpl implements UserDao {
     }
     @Override
     public void saveUser(String name, String lastName, byte age) {
-        User user = new User();
-        try (Session session = util.getSessionConnection().openSession()) {
+       User user = new User();
+       try (Session session = util.getSessionConnection().openSession()) {
             session.beginTransaction();
             user.setName(name);
             user.setLastName(lastName);
